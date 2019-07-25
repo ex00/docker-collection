@@ -8,9 +8,18 @@ docker build -t flink:mesos .
 ```
 ### Run FLink framework in mesos mini
 ```bash
+pwd
+#>> /docker-collection/flink
+# run mesos cluster
 docker run --rm --privileged -d --net=host --name mesos  mesos/mesos-mini
+
+# need access to flink:mesos image inside meosos cluster.
 docker cp Dockerfile mesos:/root
-docker exec mesos cd /root/ && docker build -t flink:mesos .
+# build image - docker exec mesos cd /root/ && docker build -t flink:mesos .
+docker exec -it mesos /bin/bash
+root@host> cd /root && docker build -t flink:mesos .
+....
+# create mathathon flink application master job
 cat <<EOT >> flink-app-master.json
 {
   "id": "flink-app-master",
