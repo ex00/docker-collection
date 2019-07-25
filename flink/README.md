@@ -14,10 +14,10 @@ pwd
 docker run --rm --privileged -d --net=host --name mesos  mesos/mesos-mini
 
 # need access to flink:mesos image inside meosos cluster.
+# copu docker file to mesos container
 docker cp Dockerfile mesos:/root
-# build image - docker exec mesos cd /root/ && docker build -t flink:mesos .
-docker exec -it mesos /bin/bash
-root@host> cd /root && docker build -t flink:mesos .
+# build image inside the mesos container
+docker exec mesos /bin/bash -c "cd /root/ && docker build -t flink:mesos ."
 ....
 # create mathathon flink application master job
 cat > flink-app-master.json << "END"
@@ -52,10 +52,9 @@ cat > flink-app-master.json << "END"
       "protocol": "tcp"
     },
     {
-      "port": 0,
+      "port": 10001,
       "protocol": "tcp",
-      "name": "rest",
-      "labels": null
+      "name": "rest"
     }
   ],
   "container": {
