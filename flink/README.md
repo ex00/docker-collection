@@ -20,23 +20,23 @@ docker exec -it mesos /bin/bash
 root@host> cd /root && docker build -t flink:mesos .
 ....
 # create mathathon flink application master job
-cat <<EOT >> flink-app-master.json
+cat > flink-app-master.json << "END"
 {
   "id": "flink-app-master",
-  "cmd": "/opt/flink/bin/mesos-appmaster.sh \
-   -Dmesos.master=localhost:5050 \
-   -Dmesos.resourcemanager.tasks.container.image.name=flink:mesos \
-   -Dmesos.resourcemanager.tasks.container.type=docker \
-   -Dmesos.resourcemanager.tasks.taskmanager-cmd=\"/opt/flink/bin/mesos-taskmanager.sh\" \
-   -Dmesos.resourcemanager.tasks.container.docker.force-pull-image=false \
-   -Djobmanager.heap.mb=615 \
-   -Djobmanager.rpc.port=6063 \
-   -Drest.port=8081 \
-   -Dmesos.resourcemanager.tasks.cpus=1.0 \
-   -Dmesos.resourcemanager.tasks.mem=1024 \
-   -Dtaskmanager.heap.mb=720 \
-   -Dtaskmanager.numberOfTaskSlots=1 \
-   -Dparallelism.default=1 || cat /opt/flink/log/*.log ",
+  "cmd": "/opt/flink/bin/mesos-appmaster.sh  \\\n
+         -Dmesos.master=localhost:5050 \\\n
+         -Dmesos.resourcemanager.tasks.container.image.name=flink:mesos \\\n
+         -Dmesos.resourcemanager.tasks.container.type=docker \\\n
+         -Dmesos.resourcemanager.tasks.taskmanager-cmd=\"/opt/flink/bin/mesos-taskmanager.sh\" \\\n
+         -Dmesos.resourcemanager.tasks.container.docker.force-pull-image=false \\\n
+         -Djobmanager.heap.mb=615 \\\n
+         -Djobmanager.rpc.port=$PORT0  \\\n
+         -Drest.port=$PORT1 \\\n
+         -Dmesos.resourcemanager.tasks.cpus=1.0 \\\n   
+         -Dmesos.resourcemanager.tasks.mem=1024 \\\n
+         -Dtaskmanager.heap.mb=720 \\\n
+         -Dtaskmanager.numberOfTaskSlots=1 \\\n
+         -Dparallelism.default=1 || cat /opt/flink/log/*.log ",
   "cpus": 1,
   "mem": 512.0,
   "instances": 1,
@@ -45,7 +45,20 @@ cat <<EOT >> flink-app-master.json
       "mode": "host"
     }
   ],
-   "container": {
+  "portDefinitions": [
+    {
+      "port": 10000,
+      "name": "rpc",
+      "protocol": "tcp"
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "rest",
+      "labels": null
+    }
+  ],
+  "container": {
     "type": "DOCKER",
     "docker": {
       "forcePullImage": false,
@@ -56,6 +69,6 @@ cat <<EOT >> flink-app-master.json
     "volumes": []
   }
 }
-EOT
+END
 curl -X POST http://localhost:8080/v2/apps -d @flink-app-master.json -H "Content-type: application/json"
 ```
