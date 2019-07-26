@@ -5,17 +5,17 @@ RUN apt-get update
 RUN apt-get install -y lsb-release
 RUN echo "$(lsb_release -is | tr '[:upper:]' '[:lower:]') $(lsb_release -cs)" > /distro.info
 
-# install hadoop
+# install hadoop dist if need
 #ARG HADOOP_VERSION=2.7.7
 #ENV HADOOP_HOME=/opt/hadoop
-#ENV HADOOP_CLASSPATH="$HADOOP_HOME/etc/hadoop:$HADOOP_HOME/share/hadoop/common/lib/*:$HADOOP_HOME/share/hadoop/common/*:$HADOOP_HOME/share/hadoop/hdfs:$HADOOP_HOME/share/hadoop/hdfs/lib/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/yarn/lib/*:$HADOOP_HOME/share/hadoop/yarn/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*:$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/contrib/capacity-scheduler/*.jar"
-#RUN mkdir -p $HADOOP_HOME 
+#ENV HADOOP_CLASSPATH="$HADOOP_HOME/etc/hadoop:$HADOOP_HOME/share/hadoop/common/lib/*:$HADOOP_HOME/share/hadoop/common/*:$HADOOP_HOME/share/hadoop/hdfs:$HADOOP_HOME/share/hadoop/hdfs/lib/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/yarn/lib/*:$HADOOP_HOME/share/hadoop/yarn/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*:$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/contrib/capacity-scheduler/*.jar" 
 #ADD https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz $HADOOP_HOME/hadoop.tar.gz
-#RUN tar -xzvf $HADOOP_HOME/hadoop.tar.gz -C $HADOOP_HOME  && mv $HADOOP_HOME/hadoop-${HADOOP_VERSION}/* $HADOOP_HOME/ && rm -rf $HADOOP_HOME/hadoop.tar.gz
-
+#RUN tar -xzf /tmp/hadoop.tar.gz -C $HADOOP_HOME && rm -rf $HADOOP_HOME/hadoop.tar.gz 
 
 FROM flink:$FLINK_IMAGE_VERSION 
 COPY --from=flink_base /distro.info /
+ADD https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.7.5-7.0/flink-shaded-hadoop-2-uber-2.7.5-7.0.jar $FLINK_HOME/lib/
+#COPY --from=flink_base $HADOOP_HOME/ $HADOOPE_HOME/
 
 ARG MESOS_VERSION=1.6.0
 ENV MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
