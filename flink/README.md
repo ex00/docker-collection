@@ -8,7 +8,7 @@ pwd
 
 docker build -t flink:mesos .
 # or
-FLINK_VERSION=1.8.1
+FLINK_VERSION=1.8
 MESOS_VERSION=1.6.0
 docker build -t flink:$FLINK_VERSION-mesos-$MESOS_VERSION -t flink:mesos \ 
 	--build-arg FLINK_IMAGE_VERSION=$FLINK_VERSION-scala_2.11  \  ## check existing tags on https://hub.docker.com/_/flink?tab=tags
