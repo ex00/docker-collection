@@ -1,0 +1,13 @@
+version: '3'
+services:
+  youtube-dl:
+    image: tnk4on/yt-dlp
+    container_name: youtube-dl
+    environment:
+            LOG: "yes"
+    network_mode: bridge
+    volumes:
+      - ./downloads:/downloads
+    command: |
+            -o "/downloads/%(title)s-%(id)s.%(ext)s" --download-archive /downloads/archive.txt -f mp4
+            https://www.youtube.com/watch?v=FGr7-dzOWVE&ab_channel=NeKoNeX

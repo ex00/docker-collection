@@ -1,0 +1,3 @@
+
+
+docker run --rm --user=root -v $(pwd)/downloads:/downloads qmcgaw/youtube-dl-alpine -o /downloads/file.mp4 https://example.com/master.mpd
